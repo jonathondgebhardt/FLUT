@@ -63,6 +63,11 @@ SUBROUTINE close_lu() BIND(C, NAME='close_lu')
     close(10)
 END SUBROUTINE close_lu
 
+! TODO: In order to be more consistent with the "lu" versions, the file should be opened and the logical
+! unit maintained across subroutines. I cheated a bit and just didn't close the logical unit to be somewhat
+! close to the "lu" versions. My question was, "how does the Fortran runtime handle logical unit conflicts 
+! across unique library instances?", so I think this is good enough. For now, only "print_file" is used
+! by the calling program.
 SUBROUTINE load_file() BIND(C, NAME='load_file')
     open(10, access='stream', status='old', action='read')
 END SUBROUTINE load_file
@@ -89,6 +94,7 @@ SUBROUTINE print_file() BIND(C, NAME='print_file')
         write(*, '(a)', advance='no') char
     end do
 
+    ! Don't close the logical unit to be somewhat close to the other version of this subroutine.
     ! close(lun)
 END SUBROUTINE print_file
 

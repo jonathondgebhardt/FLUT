@@ -116,22 +116,33 @@ int main() {
     const auto lib_1 = create_working_dir("1");
     const auto lib_2 = create_working_dir("2");
 
-    Printer p1{lib_1};
-    Printer p2{lib_2};
     
+    // These subroutines are using the same logical unit, so they conflict.
     {
-        // p1.load_lu();
-        // p1.print_lu();
-        // // p1.close_lu(); // not closing the lu causes p2 to show p1's content
+        std::cout << "**** Using 'LU' subroutines\n";
 
-        // p2.load_lu(); // this should load 2/fort.10, but the lu is already occupied
-        // p2.print_lu();
-        // p2.close_lu();
+        Printer p1{lib_1};
+        Printer p2{lib_2};
 
-        // // p1.print_lu(); // p2 closed p1's lu, this shows garbage
+        p1.load_lu();
+        p1.print_lu();
+        // p1.close_lu(); // not closing the lu causes p2 to show p1's content
+
+        p2.load_lu(); // this should load 2/fort.10, but the lu is already occupied
+        p2.print_lu();
+        p2.close_lu();
+
+        // p1.print_lu(); // p2 closed p1's lu, this shows garbage
     }
 
+    // Even though we're not explicitly closing the file streams, this works as expected because
+    // the subroutines are loading the file into unique logical units.
     {
+        std::cout << "**** Using 'file' subroutines\n";
+        
+        Printer p1{lib_1};
+        Printer p2{lib_2};
+
         // p1.load_file();
         p1.print_file();
         // p1.close_file();
