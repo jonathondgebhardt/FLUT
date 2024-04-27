@@ -2,7 +2,8 @@ SUBROUTINE load_file() BIND(C, NAME='load_file')
     open(10, access='stream', status='old', action='read')
 END SUBROUTINE load_file
 
-SUBROUTINE print_file() BIND(C, NAME='print_file')
+! TODO: add subroutine to print file not parsed by logical unit
+SUBROUTINE print_lu() BIND(C, NAME='print_lu')
     use, intrinsic :: iso_fortran_env, only: iostat_end
     implicit none
     
@@ -17,7 +18,7 @@ SUBROUTINE print_file() BIND(C, NAME='print_file')
         if(io_status > 0) error stop '*** Error occurred while reading file. ***'
         write(*, '(a)', advance='no') char
     end do
-END SUBROUTINE print_file
+END SUBROUTINE print_lu
 
 SUBROUTINE close_file() BIND(C, NAME='close_file')
     close(10)

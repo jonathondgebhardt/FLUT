@@ -2,6 +2,7 @@
 #include <dlfcn.h>
 #include <filesystem>
 #include <cassert>
+#include <fstream>
 
 struct Printer {
     typedef void (*printer_t)();
@@ -13,7 +14,7 @@ struct Printer {
         handle_load = reinterpret_cast<printer_t>(dlsym(handle, "load_file"));
         assert(handle_load != nullptr);
 
-        handle_printer = reinterpret_cast<printer_t>(dlsym(handle, "print_file"));
+        handle_printer = reinterpret_cast<printer_t>(dlsym(handle, "print_lu"));
         assert(handle_printer != nullptr);
 
         handle_close = reinterpret_cast<printer_t>(dlsym(handle, "close_file"));
@@ -59,13 +60,23 @@ struct Printer {
 };
 
 int main() {
-    std::filesystem::remove_all("1");
-    std::filesystem::remove_all("2");
+    const auto create_working_dir = [](const std::string& wd) {
+        std::filesystem::remove_all(wd);
+        std::filesystem::create_directory(wd);
 
-    std::filesystem::create_directory("1");
-    std::filesystem::copy("../fort.10_1", "1/fort.10");
-    std::filesystem::create_directory("2");
-    std::filesystem::copy("../fort.10_2", "2/fort.10");
+        const auto file_content = "hello from " + wd + "\n";
+        {
+            std::ofstream ofs{wd + "/fort.10"};
+            ofs << file_content;
+        }
+        {
+            std::ofstream ofs{wd + "/file.txt"};
+            ofs << file_content;
+        }
+    };
+
+    create_working_dir("1");
+    create_working_dir("2");
 
     Printer p1{"./libfileprinter_1.so", "1"};
     Printer p2{"./libfileprinter_2.so", "2"};
