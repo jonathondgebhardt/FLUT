@@ -87,11 +87,13 @@ int main() {
     
     p1.load_lu();
     p1.print_lu();
-    p1.close_lu();
+    // p1.close_lu(); // not closing the lu causes p2 to show p1's content
 
-    p2.load_lu();
+    p2.load_lu(); // this should load 2/fort.10, but the lu is already occupied
     p2.print_lu();
     p2.close_lu();
+
+    // p1.print_lu(); // p2 closed p1's lu, this shows garbage
 
     return 0;
 }

@@ -1,6 +1,5 @@
 SUBROUTINE load_lu() BIND(C, NAME='load_lu')
-    open(10, access='stream', status='old', action='read')
-    ! open(10, action='read', position='rewind')
+    open(10, access='stream', status='old', action='read', position='rewind')
 END SUBROUTINE load_lu
 
 ! TODO: add subroutine to print file not parsed by logical unit
