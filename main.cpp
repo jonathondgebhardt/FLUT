@@ -104,15 +104,8 @@ std::string create_working_dir(const std::string& wd) {
     std::filesystem::remove_all(wd);
     std::filesystem::create_directory(wd);
 
-    const auto file_content = "hello from " + wd + "\n";
-    {
-        std::ofstream ofs{wd + "/fort.10"};
-        ofs << file_content;
-    }
-    {
-        std::ofstream ofs{wd + "/file.txt"};
-        ofs << file_content;
-    }
+    std::ofstream ofs{wd + "/fort.10"};
+    ofs << "hello from " + wd + "\n";
 
     const auto library_copy = wd + "/libfileprinter.so." + wd;
     std::filesystem::copy("libfileprinter.so", library_copy);

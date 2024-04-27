@@ -72,7 +72,7 @@ SUBROUTINE print_file() BIND(C, NAME='print_file')
     use, intrinsic :: iso_fortran_env, only: iostat_end
     implicit none
 
-    character(*), parameter :: file_name = 'file.txt'
+    character(*), parameter :: file_name = 'fort.10'
 
     integer   :: lun, io_status
     character :: char
