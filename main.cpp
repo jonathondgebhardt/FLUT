@@ -11,52 +11,52 @@ struct Printer {
         handle = dlopen(lib.c_str(), RTLD_LAZY);
         assert(handle != nullptr);
 
-        handle_load = reinterpret_cast<printer_t>(dlsym(handle, "load_file"));
-        assert(handle_load != nullptr);
+        handle_load_lu = reinterpret_cast<printer_t>(dlsym(handle, "load_lu"));
+        assert(handle_load_lu != nullptr);
 
-        handle_printer = reinterpret_cast<printer_t>(dlsym(handle, "print_lu"));
-        assert(handle_printer != nullptr);
+        handle_print_lu = reinterpret_cast<printer_t>(dlsym(handle, "print_lu"));
+        assert(handle_print_lu != nullptr);
 
-        handle_close = reinterpret_cast<printer_t>(dlsym(handle, "close_file"));
-        assert(handle_close != nullptr);
+        handle_close_lu = reinterpret_cast<printer_t>(dlsym(handle, "close_lu"));
+        assert(handle_close_lu != nullptr);
     }
 
     ~Printer() {
         dlclose(handle);
     }
 
-    void load() {
+    void load_lu() {
         const auto old_wd = std::filesystem::current_path();
         
-        std::cout << "** changing to \"" << wd << "\" and calling " << lib << "::load\n";
+        std::cout << "** changing to \"" << wd << "\" and calling " << lib << "::load_lu\n";
         std::filesystem::current_path(wd);
-        handle_load();
+        handle_load_lu();
      
         std::cout << "** restoring " << old_wd << "\n";
         std::filesystem::current_path(old_wd);
     }
 
-    void print() {
+    void print_lu() {
         const auto old_wd = std::filesystem::current_path();
         
-        std::cout << "** changing to \"" << wd << "\" and calling " << lib << "::print\n\n";
+        std::cout << "** changing to \"" << wd << "\" and calling " << lib << "::print_lu\n\n";
         std::filesystem::current_path(wd);
-        handle_printer();
+        handle_print_lu();
 
         std::cout << "\n** restoring " << old_wd << "\n";
         std::filesystem::current_path(old_wd);
     }
 
-    void close() {
-        handle_close();
+    void close_lu() {
+        handle_close_lu();
     }
 
     std::string lib;
     std::string wd;
     void* handle;
-    printer_t handle_load;
-    printer_t handle_printer;
-    printer_t handle_close;
+    printer_t handle_load_lu;
+    printer_t handle_print_lu;
+    printer_t handle_close_lu;
 };
 
 std::string create_working_dir(const std::string& wd) {
@@ -85,13 +85,13 @@ int main() {
     Printer p1{lib_1};
     Printer p2{lib_2};
     
-    p1.load();
-    p1.print();
-    p1.close();
+    p1.load_lu();
+    p1.print_lu();
+    p1.close_lu();
 
-    p2.load();
-    p2.print();
-    p2.close();
+    p2.load_lu();
+    p2.print_lu();
+    p2.close_lu();
 
     return 0;
 }
