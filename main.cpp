@@ -7,7 +7,7 @@
 struct Printer {
     typedef void (*printer_t)();
 
-    Printer(const std::string& lib, const std::string wd) : lib(lib), wd(wd) {
+    Printer(const std::string& lib) : lib(lib), wd(std::filesystem::path(lib).parent_path().string()) {
         handle = dlopen(lib.c_str(), RTLD_LAZY);
         assert(handle != nullptr);
 
@@ -59,27 +59,31 @@ struct Printer {
     printer_t handle_close;
 };
 
+std::string create_working_dir(const std::string& wd) {
+    std::filesystem::remove_all(wd);
+    std::filesystem::create_directory(wd);
+
+    const auto file_content = "hello from " + wd + "\n";
+    {
+        std::ofstream ofs{wd + "/fort.10"};
+        ofs << file_content;
+    }
+    {
+        std::ofstream ofs{wd + "/file.txt"};
+        ofs << file_content;
+    }
+
+    const auto library_copy = wd + "/libfileprinter.so." + wd;
+    std::filesystem::copy("libfileprinter.so", library_copy);
+    return library_copy;
+}
+
 int main() {
-    const auto create_working_dir = [](const std::string& wd) {
-        std::filesystem::remove_all(wd);
-        std::filesystem::create_directory(wd);
+    const auto lib_1 = create_working_dir("1");
+    const auto lib_2 = create_working_dir("2");
 
-        const auto file_content = "hello from " + wd + "\n";
-        {
-            std::ofstream ofs{wd + "/fort.10"};
-            ofs << file_content;
-        }
-        {
-            std::ofstream ofs{wd + "/file.txt"};
-            ofs << file_content;
-        }
-    };
-
-    create_working_dir("1");
-    create_working_dir("2");
-
-    Printer p1{"./libfileprinter_1.so", "1"};
-    Printer p2{"./libfileprinter_2.so", "2"};
+    Printer p1{lib_1};
+    Printer p2{lib_2};
     
     p1.load();
     p1.print();
