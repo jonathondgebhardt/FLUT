@@ -78,7 +78,9 @@ SUBROUTINE print_file() BIND(C, NAME='print_file')
     character :: char
 
     open(newunit=lun, file=file_name, access='stream', status='old',  &
-         action='read')
+         action='read', position='rewind')
+
+    write(*,*) "Using lu ", lun
 
     do
         read(lun, iostat=io_status) char
@@ -87,7 +89,7 @@ SUBROUTINE print_file() BIND(C, NAME='print_file')
         write(*, '(a)', advance='no') char
     end do
 
-    close(lun)
+    ! close(lun)
 END SUBROUTINE print_file
 
 SUBROUTINE close_file() BIND(C, NAME='close_file')

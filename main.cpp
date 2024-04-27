@@ -19,6 +19,15 @@ struct Printer {
 
         handle_close_lu = reinterpret_cast<printer_t>(dlsym(handle, "close_lu"));
         assert(handle_close_lu != nullptr);
+
+        handle_load_file = reinterpret_cast<printer_t>(dlsym(handle, "load_file"));
+        assert(handle_load_file != nullptr);
+
+        handle_print_file = reinterpret_cast<printer_t>(dlsym(handle, "print_file"));
+        assert(handle_print_file != nullptr);
+
+        handle_close_file = reinterpret_cast<printer_t>(dlsym(handle, "close_file"));
+        assert(handle_close_file != nullptr);
     }
 
     ~Printer() {
@@ -36,6 +45,17 @@ struct Printer {
         std::filesystem::current_path(old_wd);
     }
 
+    void load_file() {
+        const auto old_wd = std::filesystem::current_path();
+        
+        std::cout << "** changing to \"" << wd << "\" and calling " << lib << "::load_file\n";
+        std::filesystem::current_path(wd);
+        handle_load_file();
+     
+        std::cout << "** restoring " << old_wd << "\n";
+        std::filesystem::current_path(old_wd);
+    }
+
     void print_lu() {
         const auto old_wd = std::filesystem::current_path();
         
@@ -47,16 +67,37 @@ struct Printer {
         std::filesystem::current_path(old_wd);
     }
 
+    void print_file() {
+        const auto old_wd = std::filesystem::current_path();
+        
+        std::cout << "** changing to \"" << wd << "\" and calling " << lib << "::print_file\n\n";
+        std::filesystem::current_path(wd);
+        handle_print_file();
+
+        std::cout << "\n** restoring " << old_wd << "\n";
+        std::filesystem::current_path(old_wd);
+    }
+
     void close_lu() {
         handle_close_lu();
     }
 
+    void close_file() {
+        handle_close_file();
+    }
+
     std::string lib;
     std::string wd;
+    
     void* handle;
+    
     printer_t handle_load_lu;
     printer_t handle_print_lu;
     printer_t handle_close_lu;
+
+    printer_t handle_load_file;
+    printer_t handle_print_file;
+    printer_t handle_close_file;
 };
 
 std::string create_working_dir(const std::string& wd) {
@@ -85,15 +126,27 @@ int main() {
     Printer p1{lib_1};
     Printer p2{lib_2};
     
-    p1.load_lu();
-    p1.print_lu();
-    // p1.close_lu(); // not closing the lu causes p2 to show p1's content
+    {
+        // p1.load_lu();
+        // p1.print_lu();
+        // // p1.close_lu(); // not closing the lu causes p2 to show p1's content
 
-    p2.load_lu(); // this should load 2/fort.10, but the lu is already occupied
-    p2.print_lu();
-    p2.close_lu();
+        // p2.load_lu(); // this should load 2/fort.10, but the lu is already occupied
+        // p2.print_lu();
+        // p2.close_lu();
 
-    // p1.print_lu(); // p2 closed p1's lu, this shows garbage
+        // // p1.print_lu(); // p2 closed p1's lu, this shows garbage
+    }
+
+    {
+        // p1.load_file();
+        p1.print_file();
+        // p1.close_file();
+
+        // p2.load_file();
+        p2.print_file();
+        // p2.close_file();
+    }
 
     return 0;
 }
